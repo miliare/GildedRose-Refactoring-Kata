@@ -5,13 +5,16 @@ open System.Collections.Generic
 open Xunit
 open Swensen.Unquote
 
-let mkItem name sellIn quality = {
+type SellIn = int
+type Quality = int
+
+let mkItem name (sellIn: SellIn) (quality: Quality) = {
     Name = name
     SellIn = sellIn
     Quality = quality
 }
 
-let testItem expectedSellIn expectedQuality item =
+let testItem (expectedSellIn: SellIn) (expectedQuality: Quality) item =
     test <@ expectedSellIn = item.SellIn @>
     test <@ expectedQuality = item.Quality @>
 
@@ -22,7 +25,7 @@ let ``Standard items updates`` () =
     |> Items.Add
     let app = GildedRose Items
     
-    let values = [|
+    let values : (SellIn * Quality) array = [|
         0, 2
         -1, 0
         -2, 0
@@ -41,7 +44,7 @@ let ``Aged Brie item updates`` () =
     |> Items.Add
     let app = GildedRose Items
     
-    let values = [|
+    let values : (SellIn * Quality) array = [|
         0, 48
         -1, 50
         -2, 50
@@ -60,7 +63,7 @@ let ``Sulfuras, Hand of Ragnaros item updates`` () =
     |> Items.Add
     let app = GildedRose Items
     
-    let values = Array.init 100 (fun _ -> 0, 80)
+    let values : (SellIn * Quality) array = Array.init 100 (fun _ -> 0, 80)
 
     test <@ "Sulfuras, Hand of Ragnaros" = Items.[0].Name @>
     for value in values do
@@ -75,7 +78,7 @@ let ``Backstage passes to a TAFKAL80ETC concert item updates`` () =
     |> Items.Add
     let app = GildedRose Items
     
-    let values = [|
+    let values : (SellIn * Quality) array = [|
         10, 11
         9, 13
         8, 15
@@ -103,7 +106,7 @@ let ``Conjured items updates`` () =
     |> Items.Add
     let app = GildedRose Items
     
-    let values = [|
+    let values : (SellIn * Quality) array = [|
         2, 8
         1, 6
         0, 4
