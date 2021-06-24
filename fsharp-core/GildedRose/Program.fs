@@ -14,6 +14,11 @@ type GildedRose(items:IList<Item>) =
         let sulfuras = "Sulfuras, Hand of Ragnaros"
         let conjured = "Conjured"
         
+        let (|Expired|_|) = function
+            | s when s < 0 -> Some ()
+            | _ -> None
+            
+        
         let updateSellIn item =
             if item.Name = sulfuras then
                 item
@@ -23,32 +28,32 @@ type GildedRose(items:IList<Item>) =
         let updateBackstagePass item =
             let newQuality =
                 match item.SellIn with
-                | s when s < 0 -> 0
+                | Expired -> 0
                 | s when s < 5 -> item.Quality + 3
                 | s when s < 10 -> item.Quality + 2
                 | _ -> item.Quality + 1
-            {item with Quality = System.Math.Clamp(newQuality, 0, 50)}
+            {item with Quality = newQuality}
             
         let updateAgedBrie item =
             let newQuality =
                 match item.SellIn with
-                | s when s < 0 -> item.Quality + 2
+                | Expired -> item.Quality + 2
                 | _ -> item.Quality + 1
-            {item with Quality = System.Math.Clamp(newQuality, 0, 50)}
+            {item with Quality = newQuality}
             
         let updateStandardItem item =
             let newQuality =
                 match item.SellIn with
-                | s when s < 0 -> item.Quality - 2
+                | Expired -> item.Quality - 2
                 | _ -> item.Quality - 1
-            {item with Quality = System.Math.Clamp(newQuality, 0, 50)}
+            {item with Quality = newQuality}
             
         let updateConjuredItem item =
             let newQuality =
                 match item.SellIn with
-                | s when s < 0 -> item.Quality - 4
+                | Expired -> item.Quality - 4
                 | _ -> item.Quality - 2
-            {item with Quality = System.Math.Clamp(newQuality, 0, 50)}
+            {item with Quality = newQuality}
             
         let updateQuality item =
             if item.Name = sulfuras then
@@ -62,8 +67,14 @@ type GildedRose(items:IList<Item>) =
             else
                 updateStandardItem item
                 
+        let validateQuality item =
+            if item.Name = sulfuras then
+                {item with Quality = 80}
+            else
+                {item with Quality = System.Math.Clamp(item.Quality, 0, 50)}
+                
         let updateItem =
-            updateSellIn >> updateQuality
+            updateSellIn >> updateQuality >> validateQuality
         
         for i = 0 to Items.Count - 1 do
             Items.[i] <- updateItem Items.[i]
