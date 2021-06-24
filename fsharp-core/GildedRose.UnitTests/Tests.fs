@@ -74,22 +74,22 @@ let ``Sulfuras, Hand of Ragnaros item updates`` () =
 [<Fact>]
 let ``Backstage passes to a TAFKAL80ETC concert item updates`` () =
     let Items = List<Item>()  
-    mkItem "Backstage passes to a TAFKAL80ETC concert" 11 10
+    mkItem "Backstage passes to a TAFKAL80ETC concert" 11 32
     |> Items.Add
     let app = GildedRose Items
     
     let values : (SellIn * Quality) array = [|
-        10, 11
-        9, 13
-        8, 15
-        7, 17
-        6, 19
-        5, 21
-        4, 24
-        3, 27
-        2, 30
-        1, 33
-        0, 36
+        10, 33
+        9, 35
+        8, 37
+        7, 39
+        6, 41
+        5, 43
+        4, 46
+        3, 49
+        2, 50
+        1, 50
+        0, 50
         -1, 0
     |]
 
