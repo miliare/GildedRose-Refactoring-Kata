@@ -5,56 +5,114 @@ open System.Collections.Generic
 open Xunit
 open Swensen.Unquote
 
+let mkItem name sellIn quality = {
+    Name = name
+    SellIn = sellIn
+    Quality = quality
+}
+
+let testItem expectedSellIn expectedQuality item =
+    test <@ expectedSellIn = item.SellIn @>
+    test <@ expectedQuality = item.Quality @>
+
 [<Fact>]
 let ``Standard items updates`` () =
-    let Items = List<Item>()  
-    Items.Add({
-        Name = "+5 Dexterity Vest"
-        SellIn = 1
-        Quality = 3})
-    let app = GildedRose(Items)
-    app.UpdateQuality()
+    let Items = List<Item>()
+    mkItem "+5 Dexterity Vest" 1 3
+    |> Items.Add
+    let app = GildedRose Items
+    
+    let values = [|
+        0, 2
+        -1, 0
+        -2, 0
+    |]
+    
     test <@ "+5 Dexterity Vest" = Items.[0].Name @>
-    test <@ 0 = Items.[0].SellIn @>
-    test <@ 2 = Items.[0].Quality @>
-    app.UpdateQuality()
-    test <@ -1 = Items.[0].SellIn @>
-    test <@ 0 = Items.[0].Quality @>
-    app.UpdateQuality()
-    test <@ -2 = Items.[0].SellIn @>
-    test <@ 0 = Items.[0].Quality @>
+    for value in values do
+        app.UpdateQuality()
+        Items.[0]
+        |> (value ||> testItem)
 
 [<Fact>]
 let ``Aged Brie item updates`` () =
     let Items = List<Item>()  
-    Items.Add({
-        Name = "Aged Brie"
-        SellIn = 1
-        Quality = 47})
-    let app = GildedRose(Items)
-    app.UpdateQuality()
+    mkItem "Aged Brie" 1 47
+    |> Items.Add
+    let app = GildedRose Items
+    
+    let values = [|
+        0, 48
+        -1, 50
+        -2, 50
+    |]
+
     test <@ "Aged Brie" = Items.[0].Name @>
-    test <@ 0 = Items.[0].SellIn @>
-    test <@ 48 = Items.[0].Quality @>
-    app.UpdateQuality()
-    test <@ -1 = Items.[0].SellIn @>
-    test <@ 50 = Items.[0].Quality @>
-    app.UpdateQuality()
-    test <@ -2 = Items.[0].SellIn @>
-    test <@ 50 = Items.[0].Quality @>
+    for value in values do
+        app.UpdateQuality()
+        Items.[0]
+        |> (value ||> testItem)
 
 [<Fact>]
 let ``Sulfuras, Hand of Ragnaros item updates`` () =
     let Items = List<Item>()  
-    Items.Add({
-        Name = "Sulfuras, Hand of Ragnaros"
-        SellIn = 0
-        Quality = 80})
-    let app = GildedRose(Items)
-    app.UpdateQuality()
+    mkItem "Sulfuras, Hand of Ragnaros" 0 80
+    |> Items.Add
+    let app = GildedRose Items
+    
+    let values = Array.init 100 (fun _ -> 0, 80)
+
     test <@ "Sulfuras, Hand of Ragnaros" = Items.[0].Name @>
-    test <@ 0 = Items.[0].SellIn @>
-    test <@ 80 = Items.[0].Quality @>
-    app.UpdateQuality()
-    test <@ 0 = Items.[0].SellIn @>
-    test <@ 80 = Items.[0].Quality @>
+    for value in values do
+        app.UpdateQuality()
+        Items.[0]
+        |> (value ||> testItem)
+
+[<Fact>]
+let ``Backstage passes to a TAFKAL80ETC concert item updates`` () =
+    let Items = List<Item>()  
+    mkItem "Backstage passes to a TAFKAL80ETC concert" 11 10
+    |> Items.Add
+    let app = GildedRose Items
+    
+    let values = [|
+        10, 11
+        9, 13
+        8, 15
+        7, 17
+        6, 19
+        5, 21
+        4, 24
+        3, 27
+        2, 30
+        1, 33
+        0, 36
+        -1, 0
+    |]
+
+    test <@ "Backstage passes to a TAFKAL80ETC concert" = Items.[0].Name @>
+    for value in values do
+        app.UpdateQuality()
+        Items.[0]
+        |> (value ||> testItem)
+
+[<Fact>]
+let ``Conjured items updates`` () =
+    let Items = List<Item>()
+    mkItem "Conjured Mana Cake" 3 10
+    |> Items.Add
+    let app = GildedRose Items
+    
+    let values = [|
+        2, 8
+        1, 6
+        0, 4
+        -1, 0
+        -2, 0
+    |]
+    
+    test <@ "Conjured Mana Cake" = Items.[0].Name @>
+    for value in values do
+        app.UpdateQuality()
+        Items.[0]
+        |> (value ||> testItem)
