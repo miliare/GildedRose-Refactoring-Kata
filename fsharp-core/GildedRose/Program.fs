@@ -23,34 +23,40 @@ type GildedRose(items:IList<Item>) =
             let newQuality =
                 match item.SellIn with
                 | s when s < 0 -> 0
-                | s when s < 5 -> item.Quality + 2 // TODO
-                | s when s < 10 -> item.Quality + 1
-                | _ -> item.Quality
+                | s when s < 5 -> item.Quality + 3
+                | s when s < 10 -> item.Quality + 2
+                | _ -> item.Quality + 1
             {item with Quality = System.Math.Clamp(newQuality, 0, 50)}
+            
+        let updateAgedBrie item =
+            let newQuality =
+                match item.SellIn with
+                | s when s < 0 -> item.Quality + 2
+                | _ -> item.Quality + 1
+            {item with Quality = System.Math.Clamp(newQuality, 0, 50)}
+            
+        let updateStandardItem item =
+            let newQuality =
+                match item.SellIn with
+                | s when s < 0 -> item.Quality - 2
+                | _ -> item.Quality - 1
+            {item with Quality = System.Math.Clamp(newQuality, 0, 50)}
+            
+        let updateQuality item =
+            if item.Name = sulfuras then
+                item
+            else if item.Name = backstagePass then
+                updateBackstagePass item
+            else if item.Name = agedBrie then
+                updateAgedBrie item
+            else
+                updateStandardItem item
+                
+        let updateItem =
+            updateSellIn >> updateQuality
         
         for i = 0 to Items.Count - 1 do
-            Items.[i] <- updateSellIn Items.[i]
-            
-            if Items.[i].Name = agedBrie || Items.[i].Name = backstagePass then
-               if Items.[i].Quality < 50 then
-                    Items.[i] <- { Items.[i] with Quality = (Items.[i].Quality + 1) } 
-                    if Items.[i].Name = backstagePass then
-                        Items.[i] <- updateBackstagePass Items.[i]
-            else if Items.[i].Quality > 0 then
-                if Items.[i].Name <> sulfuras then
-                    Items.[i] <- { Items.[i] with Quality = (Items.[i].Quality - 1) }
-                        
-            if Items.[i].SellIn < 0 then
-                if Items.[i].Name <> agedBrie then
-                    if Items.[i].Name <> backstagePass then
-                        if Items.[i].Quality > 0 then
-                            if Items.[i].Name <> sulfuras then
-                                Items.[i] <- { Items.[i] with Quality   = (Items.[i].Quality  - 1) } 
-                    else
-                        Items.[i] <- { Items.[i] with Quality   = (Items.[i].Quality  - Items.[i].Quality) } 
-                else
-                    if Items.[i].Quality < 50 then
-                        Items.[i] <- { Items.[i] with Quality   = (Items.[i].Quality + 1) }  
+            Items.[i] <- updateItem Items.[i]
         ()
 
 
