@@ -12,6 +12,7 @@ type GildedRose(items:IList<Item>) =
         let backstagePass = "Backstage passes to a TAFKAL80ETC concert"
         let agedBrie = "Aged Brie"
         let sulfuras = "Sulfuras, Hand of Ragnaros"
+        let conjured = "Conjured"
         
         let updateSellIn item =
             if item.Name = sulfuras then
@@ -42,6 +43,13 @@ type GildedRose(items:IList<Item>) =
                 | _ -> item.Quality - 1
             {item with Quality = System.Math.Clamp(newQuality, 0, 50)}
             
+        let updateConjuredItem item =
+            let newQuality =
+                match item.SellIn with
+                | s when s < 0 -> item.Quality - 4
+                | _ -> item.Quality - 2
+            {item with Quality = System.Math.Clamp(newQuality, 0, 50)}
+            
         let updateQuality item =
             if item.Name = sulfuras then
                 item
@@ -49,6 +57,8 @@ type GildedRose(items:IList<Item>) =
                 updateBackstagePass item
             else if item.Name = agedBrie then
                 updateAgedBrie item
+            else if item.Name.StartsWith conjured then
+                updateConjuredItem item
             else
                 updateStandardItem item
                 
