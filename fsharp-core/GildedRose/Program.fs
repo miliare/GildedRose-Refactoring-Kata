@@ -18,6 +18,9 @@ type GildedRose(items:IList<Item>) =
             | s when s < 0 -> Some ()
             | _ -> None
             
+        let (|NDaysRemaining|_|) days = function
+            | s when s < days -> Some ()
+            | _ -> None
         
         let updateSellIn item =
             if item.Name = sulfuras then
@@ -29,8 +32,8 @@ type GildedRose(items:IList<Item>) =
             let newQuality =
                 match item.SellIn with
                 | Expired -> 0
-                | s when s < 5 -> item.Quality + 3
-                | s when s < 10 -> item.Quality + 2
+                | NDaysRemaining 5 -> item.Quality + 3
+                | NDaysRemaining 10 -> item.Quality + 2
                 | _ -> item.Quality + 1
             {item with Quality = newQuality}
             
